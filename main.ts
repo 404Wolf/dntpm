@@ -33,6 +33,7 @@ async function barePackageToVal(packageName: string) {
   return extendedVal;
 }
 
+// Configure the dntpm server
 const baseUrl = "https://esm.town/v";
 const dntpmConfig: DntpmConfig = {
   getPackageMeta: async (packageName: string) => {
