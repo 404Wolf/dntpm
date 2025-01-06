@@ -1,6 +1,6 @@
 import ValTown from "npm:@valtown/sdk";
-import { DenoRegistry } from "@dntpm/config.ts";
-import Server from "@dntpm/server.ts";
+import { DntpmConfig } from "@dntpm/config.ts";
+import { serve } from "@dntpm/server.ts";
 import "@std/dotenv/load";
 
 const valtown = new ValTown({ bearerToken: Deno.env.get("VAL_TOWN_API_KEY") });
@@ -33,9 +33,8 @@ async function barePackageToVal(packageName: string) {
   return extendedVal;
 }
 
-const baseUrl = "https://esm.town/v/";
-const denoRegistry: DenoRegistry = {
-  name: "dntpm",
+const baseUrl = "https://esm.town/v";
+const dntpmConfig: DntpmConfig = {
   getPackageMeta: async (packageName: string) => {
     const val = await barePackageToVal(packageName);
     return {
@@ -68,6 +67,4 @@ const denoRegistry: DenoRegistry = {
   },
 };
 
-const server = new Server({ denoRegistry });
-const app = await server.getApp();
-await app.listen({ port: 8000 });
+serve(dntpmConfig);

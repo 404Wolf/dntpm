@@ -1,24 +1,11 @@
 /**
- * A DenoRegistry contains the config necessary to go from a npm bare import,
- * like @wolf/foobar, to a Deno module URL, like
- * https://esm.town/v/wolf/foobar, and retrieve metadata. It also contains some
- * metadata about the registry itself.
+ * Config containing the config necessary to go from a npm bare import, like
+ * `@wolf/foobar`, to a Deno module URL, like `https://esm.town/v/wolf/foobar`,
+ * and retrieve metadata. It also contains some metadata about the registry
+ * itself.
  */
-export interface DenoRegistry {
-  /**
-   * The name of the registry.
-   */
-  name: string;
-
-  /**
-   * Take a bare reference for an npm package and convert it to a deno URL
-   * package reference.
-   */
+export interface DntpmConfig {
   getPackageDenoUrl: (packageName: string) => Promise<string> | string;
-
-  /**
-   * Get metadata for a specific package, based on the name of the package.
-   */
   getPackageMeta: (packageName: string) => Promise<PackageMeta> | PackageMeta;
 }
 

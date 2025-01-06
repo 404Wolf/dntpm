@@ -1,0 +1,30 @@
+{
+  "name": "refreshAnimalWidget",
+  "version": "v48",
+  "description": "",
+  "author": {
+    "name": "crsven",
+    "url": "https://val.town/v/crsven"
+  },
+  "repository": {
+    "url": "https://api.val.town/v1/vals/c773d209-a2ba-4e04-b181-ec64abf48d5e",
+    "type": "valtown"
+  },
+  "license": "n/a",
+  "main": "./script/dntpm_wolf_impressiveAmaranthEgretba0cab9f7fd4c453_entrypoint.js",
+  "module": "./esm/dntpm_wolf_impressiveAmaranthEgretba0cab9f7fd4c453_entrypoint.js",
+  "exports": {
+    ".": {
+      "import": "./esm/dntpm_wolf_impressiveAmaranthEgretba0cab9f7fd4c453_entrypoint.js",
+      "require": "./script/dntpm_wolf_impressiveAmaranthEgretba0cab9f7fd4c453_entrypoint.js"
+    }
+  },
+  "scripts": {
+    "test": "node test_runner.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.9.0",
+    "picocolors": "^1.0.0"
+  },
+  "_generatedBy": "dnt@dev"
+}

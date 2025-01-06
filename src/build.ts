@@ -1,30 +1,26 @@
-import type { DenoRegistry } from "@dntpm/config.ts";
+import type { DntpmConfig } from "@dntpm/config.ts";
 import { create } from "npm:tar";
-import { build as dntBuild, PackageJson } from "@deno/dnt";
-import * as path from "jsr:@std/path@1";
-
-interface PackageBuild {
-  packageJson: PackageJson;
-  packageBuild: string;
-}
+import { build as dntBuild } from "@deno/dnt";
 
 export async function build(
-  denoRegistry: DenoRegistry,
+  denoRegistry: DntpmConfig,
   packageName: string,
-): Promise<PackageBuild> {
+) {
   console.log("Building package", packageName);
-  const sanitizePackageName = packageName.replace("/", "_").replace("@", "-");
+  const sanitizePackageName = packageName.replace("/", "_").replace("@", "");
 
   // Options for creation of temp files naming
   const tempFileOptions = (task: string): Deno.MakeTempOptions => ({
-    prefix: `${denoRegistry.name}_${sanitizePackageName}`,
+    prefix: `dntpm_${sanitizePackageName}`,
     suffix: `_${task}`,
     dir: "builds",
   });
 
   // Download the entrypoint to the deno module
   const entrypoint = await Deno.makeTempFile(tempFileOptions("entrypoint"));
+  console.log("Build target entrypoint", entrypoint);
   const denoUrl = await denoRegistry.getPackageDenoUrl(packageName);
+  console.log("Package deno url", denoUrl);
   const stream = (await Deno.create(entrypoint)).writable;
   const resp = await fetch(denoUrl);
   if (!resp.body) {
@@ -34,10 +30,11 @@ export async function build(
 
   // Get the package metadata
   const packageMeta = await denoRegistry.getPackageMeta(packageName);
-  console.log("Package meta", packageMeta);
+  console.log("Retreived package metadata", packageMeta);
 
   // Create a directory for the output build
   const buildDir = await Deno.makeTempDir(tempFileOptions("build"));
+  console.log("Performing npm package build", buildDir);
 
   // Run the builder to create the package
   await dntBuild({
@@ -51,24 +48,16 @@ export async function build(
       }
     },
   });
+  console.log("Finished with package build");
 
-  // Read and return the contents of the package json
-  const packageJson = JSON.parse(
-    await Deno.readTextFile(path.join(buildDir, "package.json")),
-  ) as PackageJson;
-  console.log("Package json", packageJson);
-
-  // Tar the build
+  // Tar the buildDir
   const tempFile = await Deno.makeTempFile(tempFileOptions("tar"));
-  create(
-    { gzip: true, file: tempFile },
-    [buildDir],
+  await create(
+    { gzip: true, file: tempFile, cwd: buildDir },
+    ["."],
   );
-  console.log("Created tar file at", tempFile);
+  console.log("Tared package build at", tempFile);
 
   // Return the package build
-  return {
-    packageJson,
-    packageBuild: tempFile,
-  };
+  return tempFile;
 }
